@@ -4,7 +4,7 @@ Adxl::Adxl(){
 
 }
 
-void Adxl::begin(){
+void Adxl::init(){
     Wire.begin();  
 
     // Set ADXL345 DATA FORMAT 
@@ -47,9 +47,9 @@ void Adxl::calibrate(){
         Y = ( Wire.read() |  Wire.read() << 8); // Y-axis value
         Z = ( Wire.read() |  Wire.read() << 8); // Z-axis value
         Serial.print("."); 
-        Serial.print("    Xa= "); Serial.print(X); 
-        Serial.print("    Ya= "); Serial.print(Y); 
-        Serial.print("    Za= "); Serial.println(Z);
+        //Serial.print("    Xa= "); Serial.print(X); 
+        //Serial.print("    Ya= "); Serial.print(Y); 
+        //Serial.print("    Za= "); Serial.println(Z);
         X_sum += X;
         Y_sum += Y;
         Z_sum += Z;
@@ -61,9 +61,9 @@ void Adxl::calibrate(){
     Y_offset = -round((Y_sum/times) / 4);
     Z_offset = -round((Z_sum/times - 256) / 4);
     this->setOffset(X_offset, Y_offset, Z_offset );
-    Serial.print("    X_Offset= "); Serial.print(X_offset); 
-    Serial.print("    Y_Offset= "); Serial.print(Y_offset); 
-    Serial.print("    Z_Offset= "); Serial.println(Z_offset);
+    //Serial.print("    X_Offset= "); Serial.print(X_offset); 
+    //Serial.print("    Y_Offset= "); Serial.print(Y_offset); 
+    //Serial.print("    Z_Offset= "); Serial.println(Z_offset);
 }
 
 void Adxl::setOffset(const int8_t offsetX, const int8_t offsetY, const int8_t offsetZ){
@@ -89,7 +89,8 @@ void Adxl::setOffset(const int8_t offsetX, const int8_t offsetY, const int8_t of
 }
 
 void Adxl::read(){
-     // === Read acceleromter data === //
+    // === Read acceleromter data === //
+    Serial.print("ADXL:");
     Wire.beginTransmission(this->ADXL345);
     Wire.write(0x32); // Start with register 0x32 (ACCEL_XOUT_H)
     Wire.endTransmission(false);

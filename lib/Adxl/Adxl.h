@@ -7,7 +7,7 @@
 class Adxl{
     public:
         Adxl();
-        void begin();
+        void init();
         void calibrate();
         void read();
         ~Adxl();
