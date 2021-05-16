@@ -13,12 +13,13 @@ void setup() {
     mpu6050.init();
     adxl345.init();
     Serial.println();
-    Serial.println("Type key when ADXL345 Sensor is placed over an horizontal plane: X = 0g, Y = 0g, Z = +1g orientation"); 
+    Serial.println("Type key when all sensors are placed over an horizontal plane: X = 0g, Y = 0g, Z = +1g orientation"); 
     while (!Serial.available()){
       //wait for a character 
     }  
     // === Calibration === //
     adxl345.calibrate();
+    mpu6050.calibrate();
     while (Serial.available()){
       Serial.read();  // clear the input buffer
     }

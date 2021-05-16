@@ -10,21 +10,25 @@ class Mpu{
     private:
         Adafruit_MPU6050 mpu;
         sensors_event_t a, g, t;
-        float gyroX, gyroY, gyroZ;
-        float accGyroX, accGyroY, accGyroZ;
-        float gyroError = 0.05;
+        float elapsedTime, currentTime, previousTime;
+        float gyroAngleX,  gyroAngleY,accAngleX,accAngleY;;
+        float roll,pitch,yaw;
 
-        float gyroXoffset = -0.03;
-        float gyroYoffset = -0.44;  
-        float gyroZoffset = -0.03;
+        float accErrorX, accErrorY,  accErrorZ;
+        float accAngleErrorX, accAngleErrorY;
+        float gyroErrorX, gyroErrorY, gyroErrorZ;
 
-        void readGyro(sensors_event_t g);
         void readAcc(sensors_event_t a);
+        void readGyro(sensors_event_t g, float accX, float accY, float accZ);
         void readTemperature(sensors_event_t t);
+        float calculateAccAngleX(float accX, float accY, float accZ);
+        float calculateAccAngleY(float accX, float accY, float accZ);
+
 
 
     public:
         Mpu();
+        void calibrate();
         void init();
         void read();
         ~Mpu();

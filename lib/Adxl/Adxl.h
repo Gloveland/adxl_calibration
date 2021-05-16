@@ -14,10 +14,15 @@ class Adxl{
 
     private:
         int ADXL345 = 0x53; // The ADXL345 sensor I2C address
-        void setOffset(const int8_t offsetX, const int8_t offsetY, const int8_t offsetZ);
         int16_t X_out, Y_out, Z_out;  // Outputs
         int8_t X_offset, Y_offset, Z_offset;
+        float accErrorX, accErrorY,  accErrorZ;
         float Xg, Yg, Zg;
+        float accX, accY, accZ;
+        void setOffset(const int8_t offsetX, const int8_t offsetY, const int8_t offsetZ);
+        float accAngleErrorX, accAngleErrorY;
+        float calculateAccAngleX(float accX, float accY, float accZ);
+        float calculateAccAngleY(float accX, float accY, float accZ);
         float roll,pitch,rollF,pitchF=0;
    
 };
