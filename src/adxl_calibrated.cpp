@@ -1,7 +1,7 @@
 
 
 /*esta prueba funciona mas o menos bien con un data rate de 2g. lee 1 cuando x esta para arriba */
-
+#include <Arduino.h>
 #include <Wire.h>  // Wire library - used for I2C communication
 int ADXL345 = 0x53; // The ADXL345 sensor I2C address
 
@@ -10,6 +10,29 @@ int8_t X_offset, Y_offset, Z_offset;
 float Xg, Yg, Zg;
 
 float roll,pitch,rollF,pitchF=0;
+
+
+void setOffset(int8_t offsetX, int8_t offsetY, int8_t offsetZ){
+      //Off-set Calibration
+    //X-axis
+    Wire.beginTransmission(ADXL345);
+    Wire.write(0x1E);
+    Wire.write(offsetX);
+    Wire.endTransmission();
+    delay(10);
+    //Y-axis
+    Wire.beginTransmission(ADXL345);
+    Wire.write(0x1F);
+    Wire.write(offsetY);
+    Wire.endTransmission();
+    delay(10);
+    //Z-axis
+    Wire.beginTransmission(ADXL345);
+    Wire.write(0x20);
+    Wire.write(offsetZ);
+    Wire.endTransmission();
+    delay(10);
+}
 
 void setup() {
     Serial.begin(9600);               // Initiate serial communication for printing the results on the Serial monitor
@@ -90,28 +113,6 @@ void setup() {
     while (Serial.available()){
       Serial.read();  // clear the input buffer
     }
-}
-
-void setOffset(int8_t offsetX, int8_t offsetY, int8_t offsetZ){
-      //Off-set Calibration
-    //X-axis
-    Wire.beginTransmission(ADXL345);
-    Wire.write(0x1E);
-    Wire.write(offsetX);
-    Wire.endTransmission();
-    delay(10);
-    //Y-axis
-    Wire.beginTransmission(ADXL345);
-    Wire.write(0x1F);
-    Wire.write(offsetY);
-    Wire.endTransmission();
-    delay(10);
-    //Z-axis
-    Wire.beginTransmission(ADXL345);
-    Wire.write(0x20);
-    Wire.write(offsetZ);
-    Wire.endTransmission();
-    delay(10);
 }
 
 void loop() {
