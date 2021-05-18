@@ -13,7 +13,7 @@ class Adxl{
         ~Adxl();
 
     private:
-        int ADXL345 = 0x53; // The ADXL345 sensor I2C address
+        const int ADXL345 = 0x53; // The ADXL345 sensor I2C address
         int16_t X_out, Y_out, Z_out;  // Outputs
         int8_t X_offset, Y_offset, Z_offset;
         float accErrorX, accErrorY,  accErrorZ;
