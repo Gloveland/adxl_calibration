@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <float.h>
 
 #define GRAVITY_EARTH 9.80665F
 
@@ -45,6 +46,10 @@ class Mpu{
         float AccErrorX, AccErrorY,  AccErrorZ;
         float AccAngleErrorX, AccAngleErrorY;
         float GyroErrorX, GyroErrorY, GyroErrorZ;
+        float GyroX, GyroY, GyroZ;
+        float PrevGyroX, PrevGyroY, PrevGyroZ;
+        float DeviationX, DeviationY,DeviationZ;
+        float DegreesDeviationX, DegreesDeviationY, DegreesDeviationZ;
         float calculateAccAngleX(float accX, float accY, float accZ);
         float calculateAccAngleY(float accX, float accY, float accZ);
         float PreviousTime, CurrentTime, ElapsedTime;
