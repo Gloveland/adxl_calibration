@@ -155,96 +155,6 @@ void Mpu::calibrate(){
     Serial.print("DeviationX: ");Serial.println(this->DeviationX);
     Serial.print("DeviationY: ");Serial.println(this->DeviationY);
     Serial.print("DeviationZ: ");Serial.println(this->DeviationZ);
-
-    // calculamos la maxima desviacion de los angulos
-
-    float degreesX = 0.0;
-    float degreesY = 0.0;
-    float degreesZ = 0.0;
-
-    float minDegreesX = FLT_MAX;
-    float minDegreesY = FLT_MAX;
-    float minDegreesZ = FLT_MAX;
-
-    float maxDegreesX = -FLT_MAX;
-    float maxDegreesY = -FLT_MAX;
-    float maxDegreesZ = -FLT_MAX;
-    
-    for (int i = 0; i <= times; i++) {
-
-         // === Read gyroscope data === //
-        this->PreviousTime = this->CurrentTime;        // Previous time is stored before the actual time read
-        this->CurrentTime = millis();            // Current time actual time read
-        this->ElapsedTime = (this->CurrentTime - this->PreviousTime) / 1000; // Divide by 1000 to get seconds
-        Wire.beginTransmission(MPU);
-        Wire.write(0x43); // Gyro data first register address 0x43
-        Wire.endTransmission(false);
-        Wire.requestFrom(MPU, 6, true); // Read 4 registers total, each axis value is stored in 2 registers
-        // For a 250deg/s range we have to divide first the raw value by 131.0, according to the datasheet
-        rawGyroX = (Wire.read() << 8 | Wire.read()); 
-        rawGyroY = (Wire.read() << 8 | Wire.read());
-        rawGyroZ = (Wire.read() << 8 | Wire.read());
-
-        gyroX = (rawGyroX / 131.0); 
-        gyroY = (rawGyroY / 131.0);
-        gyroZ = (rawGyroZ / 131.0);
-
-
-        //Si la diferencia absoluta entre esta medicion y la anterior es menor a la desviacion maxima lo desestimo.
-        if(abs(this->PrevGyroX - gyroX) > this->DeviationX){
-            this->GyroX = gyroX - this->GyroErrorX; 
-        }
-        this->PrevGyroX = gyroX;
-
-        if(abs(this->PrevGyroY - gyroY) > this->DeviationY){
-            this->GyroY = gyroY - this->GyroErrorY;
-        }
-        this->PrevGyroY = gyroY;
-
-        if(abs(this->PrevGyroZ - gyroZ) > this->DeviationZ){
-            this->GyroZ = gyroZ - this->GyroErrorZ;
-        }
-        this->PrevGyroZ= gyroZ;
-
-        // Currently the raw values are in degrees per seconds, deg/s, so we need to multiply by sendonds (s) to get the angle in degrees
-        degreesX = this->GyroX * this->ElapsedTime; // deg/s * s = deg
-        degreesY = this->GyroY * this->ElapsedTime;
-        degreesZ = this->GyroZ * this->ElapsedTime;
-
-        Serial.print("DegreesX: ");Serial.println(degreesX);
-        Serial.print("DegreesY: ");Serial.println(degreesY);
-        Serial.print("DegreesZ: ");Serial.println(degreesZ);
-
-        if(degreesX < minDegreesX){
-            minDegreesX = degreesX;
-        }
-        if(degreesY < minDegreesY){
-            minDegreesY = degreesY;
-        }
-        if(degreesZ < minDegreesZ){
-            minDegreesZ = degreesZ;
-        }
-        if(degreesX > maxDegreesX){
-            maxDegreesX = degreesX;
-        }
-        if(degreesY > maxDegreesY){
-            maxDegreesY = degreesY;
-        }
-        if(degreesZ > maxDegreesZ){
-            maxDegreesZ = degreesZ;
-        }
-        delay(200);
-    }
-
-    this->DegreesDeviationX = max(abs(maxDegreesX), abs(minDegreesX));
-    this->DegreesDeviationY = max(abs(maxDegreesY), abs(minDegreesY));
-    this->DegreesDeviationZ = max(abs(maxDegreesZ), abs(minDegreesZ));
-
-    Serial.print("DegreesDeviationX: ");Serial.println(this->DegreesDeviationX);
-    Serial.print("DegreesDeviationY: ");Serial.println(this->DegreesDeviationY);
-    Serial.print("DegreesDeviationZ: ");Serial.println(this->DegreesDeviationZ);
-
-
 }
 
 void Mpu::read(){
@@ -271,8 +181,8 @@ void Mpu::read(){
     accAngleX = this->calculateAccAngleX(accX, accY, accZ) - this->AccAngleErrorX; //from calibration
     accAngleY = this->calculateAccAngleX(accX, accY, accZ) - this->AccAngleErrorY; 
 
-    //Serial.print("   anX: ");Serial.print(accAngleX );
-    //Serial.print("   anY: ");Serial.print(accAngleY );
+    Serial.print("   anX: ");Serial.print(accAngleX );
+    Serial.print("   anY: ");Serial.print(accAngleY );
 
     // === Read gyroscope data === //
     this->PreviousTime = this->CurrentTime;        // Previous time is stored before the actual time read
@@ -314,41 +224,32 @@ void Mpu::read(){
     //Serial.print("   degrees/seg         ");
 
     // Currently the raw values are in degrees per seconds, deg/s, so we need to multiply by sendonds (s) to get the angle in degrees
-
-    degreesX = this->GyroX * this->ElapsedTime; // deg/s * s = deg
-    degreesY = this->GyroY * this->ElapsedTime;
-    degreesZ = this->GyroZ * this->ElapsedTime;
-
-    if(abs(degreesX) > this->DegreesDeviationX){
-        this->GyroAngleX = this->GyroAngleX + degreesX;
-    }
-
-    if(abs(degreesY) > this->DegreesDeviationY){
-        this->GyroAngleY = this->GyroAngleY + degreesY;
-    }
-
-    if(abs(degreesZ) > this->DegreesDeviationZ){
-        this->GyroAngleZ = this->GyroAngleZ + degreesZ;
-    }
+    this->GyroAngleX = this->GyroAngleX + this->GyroX * this->ElapsedTime; // deg/s * s = deg
+    this->GyroAngleY = this->GyroAngleY + this->GyroY * this->ElapsedTime;
+    this->GyroAngleZ = this->GyroAngleZ + this->GyroZ * this->ElapsedTime;
     
     Serial.print("   degX: ");Serial.print(this->GyroAngleX);
     Serial.print("   degY: ");Serial.print(this->GyroAngleY);
     Serial.print("   degZ: ");Serial.print(this->GyroAngleZ);
 
-
+    //ajustamos el angulo de inclinacion con la aceleracion
+    if(abs(accAngleX  -  this->GyroAngleX) > 5.0 ){
+        this->GyroAngleX = accAngleX;
+    }
+    if(abs(accAngleY  -  this->GyroAngleY) > 5.0 ){
+        this->GyroAngleY = accAngleY;
+    }
 
     // Complementary filter - combine acceleromter and gyro angle values
-    roll  = this->GyroAngleX *  0.96 +  accAngleX * 0.04;
-    pitch = this->GyroAngleY *  0.96 +  accAngleY * 0.04;
+    roll  = this->GyroAngleX; 
+    pitch = this->GyroAngleY;
     yaw   = this->GyroAngleZ;
 
-
-    
     
     // Print the values on the serial monitor
-    //Serial.print("  roll:"); Serial.print(roll);
-    //Serial.print("  pitch:");Serial.print(pitch);
-    //Serial.print("  yaw:"); Serial.print(yaw);
+    Serial.print("  roll:"); Serial.print(roll);
+    Serial.print("  pitch:");Serial.print(pitch);
+    Serial.print("  yaw:"); Serial.print(yaw);
     Serial.println();
 }
 
